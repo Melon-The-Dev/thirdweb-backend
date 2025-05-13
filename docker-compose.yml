@@ -1,0 +1,72 @@
+version: "3"
+
+services:
+  decentragri-engine:
+    image: thirdweb/engine:latest
+    container_name: decentragri-engine
+    environment:
+      - ENCRYPTION_PASSWORD=supersecret123
+      - THIRDWEB_API_SECRET_KEY=${SECRET_KEY}
+      - ADMIN_WALLET_ADDRESS=0x592D5216727C669E8528689a1653AB69FbB8db01
+      - POSTGRES_CONNECTION_URL=postgresql://postgres:examplepassword@decentragri-postgres:5432/postgres?sslmode=disable
+      - REDIS_URL=redis://decentragri-valkey:6379/0
+      - ENABLE_HTTPS=true 
+    ports:
+      - "127.0.0.1:3005:3005"
+    cpus: "1"
+    restart: always
+    networks:
+      - decentragri-network
+
+  decentragri-valkey:
+    image: valkey/valkey:latest
+    container_name: decentragri-valkey
+    ports:
+      - "127.0.0.1:6379:6379"
+    networks:
+      - decentragri-network
+    volumes:
+      - valkey-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      retries: 5
+      timeout: 2s
+
+  decentragri-postgres:
+    image: postgres
+    container_name: decentragri-postgres
+    environment:
+      - POSTGRES_PASSWORD=examplepassword
+    command: postgres -c 'max_connections=250'
+    ports:
+      - "127.0.0.1:5432:5432"
+    networks:
+      - decentragri-network
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      retries: 5
+      timeout: 10s
+  mongo:
+      image: mongodb/mongodb-community-server:latest
+      container_name: decentragri-mongo
+      environment:
+          - MONGODB_INITDB_ROOT_USERNAME=testkarl
+          - MONGODB_INITDB_ROOT_PASSWORD=testkarl123
+      ports:
+          - "127.0.0.1:27017:27017"
+
+      restart: always
+
+     
+
+volumes:
+  valkey-data:
+  postgres-data:
+
+networks:
+  decentragri-network:
+    driver: bridge

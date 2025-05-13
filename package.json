@@ -1,0 +1,24 @@
+{
+  "name": "thirdweb-backend",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "scripts": {
+    "dev": "NODE_TLS_REJECT_UNAUTHORIZED=0 bun run --watch src/index.ts"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@thirdweb-dev/engine": "0.0.19",
+    "bcrypt": "^6.0.0",
+    "bcrypt-ts": "^7.0.0",
+    "elysia": "^1.3.1",
+    "fast-jwt": "^6.0.1",
+    "mongodb": "^6.16.0",
+    "thirdweb": "^5.99.0"
+  }
+}
