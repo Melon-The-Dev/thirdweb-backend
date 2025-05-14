@@ -28,6 +28,19 @@ const Auth = (app: Elysia) => {
         }
       }, registerSchema
     )
+    .post('/api/login/', async ({ body }): Promise<userLoginResponse> => {
+        try {
+            const authService = new AuthService();
+
+            const output = await authService.login(body)
+            return output;
+
+        } catch (error) {
+            console.error(error);
+            throw error;
+        }
+      }, loginSchema
+    )
 }
 
 export default Auth;

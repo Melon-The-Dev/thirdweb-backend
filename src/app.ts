@@ -1,6 +1,6 @@
 //* ELYSIA
 import Elysia from "elysia";
-import { routes } from "thirdweb/bridge";
+import routes from "./routes";
 
 
 

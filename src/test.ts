@@ -3,7 +3,7 @@ import { Engine } from "@thirdweb-dev/engine";
 
 
 export const engine: Engine = new Engine({
-  url: "http://localhost:3005",
+  url: "https://localhost:3005",
   accessToken: process.env.ACCESS_TOKEN || "",
   
 });

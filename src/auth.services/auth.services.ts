@@ -1,6 +1,6 @@
 import { mongoDBClient } from "../mongodb";
-import { hash } from "bcrypt-ts";
-import type { userRegistration, userLoginResponse } from "../types/types";
+import { compare, hash } from "bcrypt-ts";
+import type { userRegistration, userLoginResponse, userLogin } from "../types/types";
 import TokenService from "../security.services/token.service";
 import WalletService from "../wallet.services/wallet.services";
 
@@ -55,6 +55,50 @@ class AuthService {
 		} catch (error: any) {
 			console.error("Error registering user:", error);
 			throw new Error("Failed to register user");
+		}
+	}
+
+	public async login(loginData: userLogin): Promise<userLoginResponse> {
+		const { username, password } = loginData;
+
+		const db = mongoDBClient.db("decentragri");
+		const usersCollection = db.collection("users");
+
+		const tokenService = new TokenService();
+		const walletService = new WalletService();
+
+		try {
+
+			const user = await usersCollection.findOne({ username });
+
+			if (!user) {
+				throw new Error("Invalid username or password");
+			}
+
+			// Validate password
+			const isPasswordValid = await compare(password, user.password);
+			if (!isPasswordValid) {
+				throw new Error("Invalid username or password");
+			}
+
+			const [tokens, ] = await Promise.all([
+				tokenService.generateTokens(username),
+
+			]);
+
+			const { accessToken, refreshToken } = tokens;
+
+			return {
+				username,
+				walletAddress: user.walletAddress,
+				accessToken,
+				refreshToken,
+				loginType: "decentragri",
+
+			};
+		} catch (error: any) {
+			console.error("Error logging in:", error);
+			throw new Error("Failed to log in");
 		}
 	}
 }
